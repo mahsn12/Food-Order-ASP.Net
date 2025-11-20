@@ -1,0 +1,687 @@
+/* =========================
+   Reset & Base Styles
+========================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 62.5%;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-weight: 300;
+  line-height: 1.6;
+  font-size: 1.6rem;
+  color: #1c1d1f;
+  background-color: #f7f9fa;
+}
+
+.App {
+  min-height: 100vh;
+}
+
+/* =========================
+   Variables
+========================= */
+:root {
+  --color-purple-150: #cec0fc;
+  --color-green-150: #b0e3c6;
+  --color-orange-150: #f7c57e;
+  --color-teal-150: #85d7f3;
+}
+
+/* =========================
+   Top Offer Banner
+========================= */
+.offer-banner-top {
+  background: #c2e9eb;
+  color: white;
+  padding: 12px 0;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.offer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.offer-text {
+  color: rgb(0, 0, 0);
+}
+
+/* =========================
+   Navbar
+========================= */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 40px;
+  border-bottom: 1px solid #ddd;
+  background: white;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar .left {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  flex: 1;
+}
+
+.logo {
+  color: #5624d0;
+  font-size: 24px;
+  font-weight: bold;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.explore {
+  color: #5624d0;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 14px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.search-container {
+  position: relative;
+  flex: 1;
+  max-width: 600px;
+  min-width: 200px;
+}
+
+.search {
+  padding: 12px 16px;
+  width: 100%;
+  border-radius: 9999px;
+  border: 1px solid #1c1d1f;
+  background: #f7f9fa;
+  font-size: 14px;
+}
+
+.search:focus {
+  outline: none;
+  border-color: #5624d0;
+}
+
+.navbar .right {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: #1c1d1f;
+  font-weight: 500;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.nav-link:hover {
+  color: #5624d0;
+}
+
+.nav-icons {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.nav-icon {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.nav-icon:hover {
+  opacity: 1;
+}
+
+.login {
+  padding: 10px 20px;
+  background: white;
+  color: #1c1d1f;
+  border: 1px solid #1c1d1f;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 14px;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.login:hover {
+  background: #f7f9fa;
+}
+
+.signup {
+  padding: 10px 20px;
+  background: #1c1d1f;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 14px;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+
+.signup:hover {
+  background: #2d2f31;
+}
+
+/* =========================
+   Hero Section
+========================= */
+.hero {
+  background: #f7f9fa;
+  position: relative;
+}
+
+.hero-container {
+  position: relative;
+  width: 100%;
+}
+
+.hero-image {
+  width: 100%;
+  height: 500px;
+  overflow: hidden;
+}
+
+.hero-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-content {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 40px;
+  max-width: 1200px;
+}
+
+.hero-text {
+  max-width: 500px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+
+.hero-text h1 {
+  font-size: 38px;
+  margin-bottom: 16px;
+  color: #1c1d1f;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.hero-text p {
+  font-size: 18px;
+  margin-bottom: 24px;
+  color: #1c1d1f;
+  line-height: 1.5;
+}
+
+.cta-button {
+  padding: 14px 28px;
+  background: #5624d0;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.cta-button:hover {
+  background: #4a1fc0;
+}
+
+/* =========================
+   Essential Skills Section
+========================= */
+.essential-skills {
+  padding: 80px 40px;
+  background: #f7f9fa;
+}
+
+.essential-skills-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 60px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.essential-skills-text {
+  flex: 1;
+  text-align: left;
+  min-width: 300px;
+}
+
+.essential-skills h2 {
+  font-size: 32px;
+  margin-bottom: 16px;
+  color: #1c1d1f;
+  font-weight: 700;
+}
+
+.essential-skills .description {
+  font-size: 18px;
+  margin-bottom: 0;
+  color: #1c1d1f;
+  line-height: 1.5;
+}
+
+.skills-grid {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: nowrap;
+}
+
+.skill-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  text-align: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.skill-image {
+  width: 100%;
+  height: 280px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.skill-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.skill-name {
+  font-size: 18px;
+  color: #1c1d1f;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+/* =========================
+   Personal Plan Section
+========================= */
+.personal-plan {
+  padding: 80px 40px;
+  background: white;
+}
+
+.personal-plan-card {
+  background: #1c1d1f;
+  border-radius: 12px;
+  padding: 60px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.personal-plan-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 60px;
+}
+
+.personal-plan-text {
+  flex: 1;
+  max-width: 500px;
+  text-align: left;
+}
+
+.personal-plan-image {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.personal-plan-image img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.personal-plan h2 {
+  font-size: 32px;
+  margin-bottom: 16px;
+  color: #ffffff;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.personal-plan .description {
+  font-size: 18px;
+  margin-bottom: 30px;
+  color: #ffffff;
+  line-height: 1.5;
+  opacity: 0.9;
+}
+
+.features-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 30px;
+  list-style: none;
+  padding: 0;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.feature-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.feature-icon svg {
+  width: 16px;
+  height: 16px;
+  color: #1c1d1f;
+}
+
+.ud-text-md {
+  font-size: 16px;
+  color: #ffffff;
+  line-height: 1.4;
+}
+
+.ud-text-md strong {
+  font-weight: 700;
+}
+
+.plan-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  padding-top: 20px;
+  border-top: 1px solid #3e4143;
+}
+
+.learn-more-btn {
+  padding: 14px 28px;
+  background: #ffffff;
+  color: #1c1d1f;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.learn-more-btn:hover {
+  background: #f7f9fa;
+}
+
+.price {
+  font-weight: bold;
+  color: #ffffff;
+  font-size: 16px;
+  margin: 0;
+  opacity: 0.9;
+}
+
+.plan-footer .price {
+  color: #ffffff !important;
+  opacity: 1;
+}
+
+/* =========================
+   Featured Courses Section
+========================= */
+.featured-courses {
+  padding: 60px 40px;
+  background: #f7f9fa;
+}
+
+.featured-courses h2 {
+  font-size: 32px;
+  margin-bottom: 16px;
+  color: #1c1d1f;
+}
+
+.featured-courses .description {
+  font-size: 18px;
+  margin-bottom: 24px;
+  color: #1c1d1f;
+}
+
+.tags-container {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+
+.tag {
+  padding: 8px 16px;
+  background: white;
+  border: 1px solid #1c1d1f;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-bottom: 30px;
+}
+
+.course-card {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.course-badge {
+  background: #ffe799;
+  color: #593d00;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  display: inline-block;
+  margin-bottom: 12px;
+}
+
+.course-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #1c1d1f;
+}
+
+.instructor {
+  font-size: 14px;
+  color: #6a6f73;
+  margin-bottom: 8px;
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.stars {
+  color: #b4690e;
+  font-weight: bold;
+}
+
+.reviews {
+  color: #6a6f73;
+  font-size: 14px;
+}
+
+.price {
+  font-size: 18px;
+  font-weight: bold;
+  color: #1c1d1f;
+}
+
+.show-all-btn {
+  background: transparent;
+  border: none;
+  color: #5624d0;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* =========================
+   Trusted Companies Section
+========================= */
+.trusted {
+  padding: 60px 40px;
+  text-align: center;
+  background: white;
+  border-top: 1px solid #d1d7dc;
+}
+
+.trusted p {
+  font-size: 18px;
+  margin-bottom: 40px;
+  color: #6a6f73;
+  font-weight: 400;
+}
+
+.trusted-logos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.trusted-logos img {
+  height: 32px;
+  opacity: 0.8;
+}
+
+/* =========================
+   Responsive
+========================= */
+@media (max-width: 1200px) {
+  .essential-skills-container { gap: 40px; }
+  .skill-image { height: 250px; }
+}
+
+@media (max-width: 1024px) {
+  .essential-skills-container { gap: 40px; }
+  .skill-image { height: 220px; }
+}
+
+@media (max-width: 968px) {
+  .essential-skills-container { flex-direction: column; gap: 40px; }
+  .essential-skills-text { text-align: center; min-width: auto; }
+  .skills-grid { justify-content: center; flex-wrap: wrap; }
+  .skill-item { width: 200px; flex: none; }
+  .skill-image { height: 200px; }
+  .personal-plan-card { padding: 40px; }
+  .personal-plan-content { flex-direction: column; text-align: center; gap: 40px; }
+  .personal-plan-text { text-align: center; max-width: 100%; }
+  .features-list { align-items: center; }
+  .plan-footer { align-items: center; }
+  .personal-plan-image { justify-content: center; }
+  .personal-plan-image img { max-width: 80%; }
+}
+
+@media (max-width: 768px) {
+  .navbar { padding: 15px 20px; flex-direction: column; gap: 15px; }
+  .search-container { max-width: 100%; }
+  .search { width: 300px; }
+  .hero-content { flex-direction: column; text-align: center; padding: 40px 20px; }
+  .hero-text { max-width: 100%; margin-bottom: 30px; }
+  .essential-skills { padding: 60px 20px; }
+  .essential-skills h2 { font-size: 28px; }
+  .essential-skills .description { font-size: 16px; }
+  .skills-grid { gap: 20px; }
+  .skill-item { width: 180px; }
+  .skill-image { height: 180px; }
+  .personal-plan { padding: 60px 20px; }
+  .personal-plan-card { padding: 30px 20px; }
+  .personal-plan h2 { font-size: 28px; }
+  .personal-plan .description { font-size: 16px; }
+  .personal-plan-image img { max-width: 100%; }
+  .courses-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  .skills-grid { flex-direction: column; gap: 30px; }
+  .skill-item { width: 100%; max-width: 300px; }
+  .skill-image { height: 200px; }
+  .skill-name { font-size: 16px; }
+}
+
+@media (max-width: 480px) {
+  .hero-image { height: 350px; }
+  .hero-text { padding: 20px; }
+  .hero-text h1 { font-size: 28px; }
+  .cta-button { padding: 12px 24px; font-size: 14px; }
+  .personal-plan-card { padding: 25px 15px; }
+  .personal-plan h2 { font-size: 24px; }
+  .learn-more-btn { padding: 12px 24px; font-size: 14px; }
+  .feature-item { gap: 10px; }
+  .feature-icon { width: 28px; height: 28px; }
+  .feature-icon svg { width: 14px; height: 14px; }
+}
