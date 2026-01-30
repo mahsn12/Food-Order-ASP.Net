@@ -1,7 +1,0 @@
-{
-    "files.associations": {
-        "tm4c123gh6pm.h": "c",
-        "UART_DRIVER.C": "cpp",
-        "stdint.h": "c"
-    }
-}
