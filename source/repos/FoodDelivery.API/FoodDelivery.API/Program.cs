@@ -1,3 +1,6 @@
+using FoodDelivery.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -8,6 +11,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer("Data Source=.;initial catalog=FoodDeliveryDB;Integrated Security=True;Trust Server Certificate=True;"));
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
