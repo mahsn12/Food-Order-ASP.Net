@@ -40,7 +40,7 @@ public class AuthController(
         var token = await jwtTokenService.CreateTokenAsync(user);
         var roles = await userManager.GetRolesAsync(user);
 
-        return Ok(new AuthResponse(user.Id, user.FullName, user.Email!, token, roles));
+        return Ok(new AuthResponse(user.Id, user.FullName, user.Email!, token, roles.ToList()));
     }
 
     [HttpPost("login")]
@@ -61,7 +61,7 @@ public class AuthController(
         var token = await jwtTokenService.CreateTokenAsync(user);
         var roles = await userManager.GetRolesAsync(user);
 
-        return Ok(new AuthResponse(user.Id, user.FullName, user.Email!, token, roles));
+        return Ok(new AuthResponse(user.Id, user.FullName, user.Email!, token, roles.ToList()));
     }
 
     [HttpPost("admin/login")]
@@ -86,7 +86,7 @@ public class AuthController(
         }
 
         var token = await jwtTokenService.CreateTokenAsync(user);
-        return Ok(new AuthResponse(user.Id, user.FullName, user.Email!, token, roles));
+        return Ok(new AuthResponse(user.Id, user.FullName, user.Email!, token, roles.ToList()));
     }
 
     [HttpPost("forget-password")]
@@ -163,6 +163,6 @@ public class AuthController(
         var token = await jwtTokenService.CreateTokenAsync(user);
         var roles = await userManager.GetRolesAsync(user);
 
-        return Ok(new AuthResponse(user.Id, user.FullName, user.Email!, token, roles));
+        return Ok(new AuthResponse(user.Id, user.FullName, user.Email!, token, roles.ToList()));
     }
 }
