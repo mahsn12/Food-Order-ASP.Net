@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
+using FoodDelivery.Domain.Enums;
 
-namespace FoodDelivery.Application.DTOs.Delivery
+namespace FoodDelivery.Application.DTOs.Driver
 {
-    public record UpdateDeliveryStatusDto
-    {
-
-        public string Status { get; init; } = string.Empty;
-
-    }
+    public record UpdateDeliveryStatusDto(
+        [Required] DeliveryStatus Status
+    );
 }

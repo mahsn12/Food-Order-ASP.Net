@@ -1,110 +1,136 @@
-﻿using FoodDelivery.Application.DTOs.Delivery;
+﻿using FoodDelivery.Application.DTOs.Driver;
 using FoodDelivery.Domain.Entities;
 using FoodDelivery.Domain.Enums;
 using FoodDelivery.Domain.IRepository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace FoodDelivery.API.Areas.Driver.Controllers
 {
     [Area("Driver")]
     [ApiController]
     [Route("api/driver/deliveries")]
-    [Authorize(Roles = "Driver")]
+    [Authorize(Roles = "Delivery")] 
     public class DeliveryController : ControllerBase
     {
-        private readonly IRepository<DeliveryTracking> _deliveryRepo;
-        private object newStatus;
+       
+        private readonly IRepository<Order> _orderRepo;
 
-        public DeliveryController(IRepository<DeliveryTracking> deliveryRepo)
+        public DeliveryController(IRepository<Order> orderRepo)
         {
-            _deliveryRepo = deliveryRepo;
+            _orderRepo = orderRepo;
         }
 
-        private string GetDriverName()
+       
+        private int GetCurrentDriverId()
         {
-            return User?.Identity?.Name
-                   ?? throw new UnauthorizedAccessException("Driver not authenticated");
+            var claim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (claim == null) throw new UnauthorizedAccessException("User ID not found in token");
+            return int.Parse(claim.Value);
         }
 
-        // GET: api/driver/deliveries
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<DriverDto>>> GetAssignedDeliveries()
+        public async Task<ActionResult<IEnumerable<DriverDeliveryDto>>> GetAssignedDeliveries()
         {
-            var driverName = GetDriverName();
+            var driverId = GetCurrentDriverId();
 
-            var deliveries = await _deliveryRepo.GetAsync(
-                d => d.DriverName == driverName
+           
+            var orders = await _orderRepo.GetAsync(
+                expression: o => o.DriverId == driverId && o.Status != OrderStatus.Delivered && o.Status != OrderStatus.Cancelled,
+                includes: new System.Linq.Expressions.Expression<Func<Order, object>>[]
+                {
+                    o => o.Restaurant, 
+                    o => o.User        
+                }
             );
 
-            var result = deliveries.Select(d => new DriverDto(
-                d.OrderId,
-                d.PickupLocation,
-                d.DropoffLocation,
-                d.Status.ToString(),
-                d.ScheduledTime
+            var result = orders.Select(o => new DriverDeliveryDto(
+                o.Id,
+                o.Restaurant.Name,
+                o.User.Name,
+                o.User.Phone,
+                o.TotalPrice,
+                o.Status.ToString(),
+                o.CreatedAt
             ));
 
             return Ok(result);
         }
 
-        // GET: api/driver/deliveries/{orderId}
+       
         [HttpGet("{orderId:int}")]
-        public async Task<ActionResult<DriverDto>> GetDeliveryDetails(int orderId)
+        public async Task<ActionResult<DriverDeliveryDto>> GetDeliveryDetails(int orderId)
         {
-            var driverName = GetDriverName();
+            var driverId = GetCurrentDriverId();
 
-            var delivery = await _deliveryRepo.GetOneAsync(
-                d => d.OrderId == orderId && d.DriverName == driverName
+            var order = await _orderRepo.GetOneAsync(
+                expression: o => o.Id == orderId && o.DriverId == driverId,
+                includes: new System.Linq.Expressions.Expression<Func<Order, object>>[]
+                {
+                    o => o.Restaurant,
+                    o => o.User
+                }
             );
 
-            if (delivery == null)
-                return NotFound("Delivery not found");
+            if (order == null)
+                return NotFound("Order not found or not assigned to you.");
 
-            return Ok(new DriverDto(
-                delivery.OrderId,
-                delivery.PickupLocation,
-                delivery.DropoffLocation,
-                delivery.Status.ToString(),
-                delivery.ScheduledTime
+            return Ok(new DriverDeliveryDto(
+                order.Id,
+                order.Restaurant.Name,
+                order.User.Name,
+                order.User.Phone,
+                order.TotalPrice,
+                order.Status.ToString(),
+                order.CreatedAt
             ));
         }
 
         
-
         [HttpPut("{orderId:int}/status")]
-        public async Task<IActionResult> UpdateDeliveryStatus(
-            int orderId,
-            [FromBody] UpdateDeliveryStatusDto model)
+        public async Task<IActionResult> UpdateStatus(int orderId, [FromBody] UpdateDeliveryStatusDto request)
         {
-            if (model == null || string.IsNullOrWhiteSpace(model.Status))
-                return BadRequest("Status is required");
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            var driverName = GetDriverName();
+            var driverId = GetCurrentDriverId();
 
-            var deliveryEntity = await _deliveryRepo.GetOneAsync(
-                d => d.OrderId == orderId && d.DriverName == driverName
-            );
+           
+            var order = await _orderRepo.GetOneAsync(o => o.Id == orderId && o.DriverId == driverId);
 
-            if (deliveryEntity == null)
-                return NotFound("Delivery not found");
+            if (order == null)
+                return NotFound("Order not found.");
 
-            if (!Enum.TryParse<DeliveryStatus>(model.Status, true, out var newStatus))
-                return BadRequest("Invalid delivery status");
-
-            // Prevent redundant updates
-            if (deliveryEntity.Status is DeliveryStatus originalStatus && originalStatus == newStatus)
-                return BadRequest("Delivery already in this status");
-
-            deliveryEntity.Status = newStatus;
-            await _deliveryRepo.UpdateAsync(deliveryEntity);
-
-            return Ok(new
+           
+            OrderStatus newStatus = request.Status switch
             {
-                deliveryEntity.OrderId,
-                Status = deliveryEntity.Status.ToString(),
-                UpdatedAt = DateTime.UtcNow
-            });
+                DeliveryStatus.PickedUp => OrderStatus.OnTheWay,
+                DeliveryStatus.Delivered => OrderStatus.Delivered,
+                _ => OrderStatus.Pending
+            };
+
+           
+            if (order.Status == newStatus)
+                return BadRequest("Order is already in this status.");
+
+           
+            order.Status = newStatus;
+
+           
+            if (newStatus == OrderStatus.Delivered)
+            {
+                order.DeliveredAt = DateTime.UtcNow;
+               
+            }
+
+            
+            _orderRepo.Update(order);
+
+            
+            await _orderRepo.CommitAsync();
+
+            return Ok(new { Message = "Status updated", NewStatus = newStatus.ToString() });
         }
     }
 }

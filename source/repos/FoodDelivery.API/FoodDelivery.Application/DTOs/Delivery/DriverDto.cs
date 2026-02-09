@@ -1,35 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-
-namespace FoodDelivery.Application.DTOs.Delivery
+﻿namespace FoodDelivery.Application.DTOs.Driver
 {
-    public record DriverDto(
-             int OrderId,
-             string RestaurantName,
-             string PickupLocation,
-             string DropOffLocation,
-             string Status,
-             DateTime SchedualeTime,
-             int DriverId,
-             string DriverName
-            )
-    {
-        private string? v;
-        private DateTime scheduledTime;
-
-        public DriverDto(int orderId, string pickupLocation, string dropoffLocation)
-            : this(orderId, string.Empty, pickupLocation, dropoffLocation, string.Empty, default, 0, string.Empty)
-        {
-        }
-
-        public DriverDto(int orderId, string pickupLocation, string dropoffLocation, string? v, DateTime scheduledTime) : this(orderId, pickupLocation, dropoffLocation)
-        {
-            this.v = v;
-            this.scheduledTime = scheduledTime;
-        }
-    }
+    public record DriverDeliveryDto(
+        int OrderId,
+        string RestaurantName,    
+        string CustomerName,      
+        string CustomerPhone,     
+        decimal TotalPrice,       
+        string Status,
+        DateTime CreatedAt
+    );
 }
