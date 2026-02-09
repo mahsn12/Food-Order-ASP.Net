@@ -67,7 +67,7 @@ const resources = [
   }
 ];
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5147';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://food-delivery.runasp.net';
 
 function App() {
   const [resourceKey, setResourceKey] = useState(resources[0].key);
