@@ -77,6 +77,10 @@ function App() {
   const [createJson, setCreateJson] = useState('');
   const [editId, setEditId] = useState(null);
   const [editJson, setEditJson] = useState('');
+  const [adminUser, setAdminUser] = useState(() => localStorage.getItem('adminUser') ?? '');
+  const [authToken, setAuthToken] = useState(() => localStorage.getItem('adminToken') ?? '');
+  const [loginForm, setLoginForm] = useState({ email: '', password: '' });
+  const [loginLoading, setLoginLoading] = useState(false);
 
   const resource = useMemo(() => resources.find((r) => r.key === resourceKey), [resourceKey]);
 
@@ -84,15 +88,36 @@ function App() {
     setCreateJson(JSON.stringify(resource.createDefaults, null, 2));
     setEditId(null);
     setEditJson('');
-    loadData(resource);
-  }, [resource]);
+
+    if (authToken) {
+      loadData(resource);
+    }
+  }, [resource, authToken]);
+
+  function createHeaders(includeContentType = true) {
+    const headers = {};
+
+    if (includeContentType) {
+      headers['Content-Type'] = 'application/json';
+    }
+
+    if (authToken) {
+      headers.Authorization = `Bearer ${authToken}`;
+    }
+
+    return headers;
+  }
 
   async function loadData(activeResource = resource) {
+    if (!authToken) return;
+
     setLoading(true);
     setError('');
 
     try {
-      const response = await fetch(`${API_BASE_URL}${activeResource.endpoint}`);
+      const response = await fetch(`${API_BASE_URL}${activeResource.endpoint}`, {
+        headers: createHeaders(false)
+      });
       if (!response.ok) throw new Error(`Failed to fetch ${activeResource.label}.`);
       const data = await response.json();
       setRows(Array.isArray(data) ? data : []);
@@ -104,12 +129,60 @@ function App() {
     }
   }
 
+  async function adminLogin(event) {
+    event.preventDefault();
+    setError('');
+    setLoginLoading(true);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/Auth/admin/login`, {
+        method: 'POST',
+        headers: createHeaders(),
+        body: JSON.stringify(loginForm)
+      });
+
+      if (!response.ok) {
+        if (response.status === 403) {
+          throw new Error('This user does not have the Admin role.');
+        }
+
+        const body = await response.text();
+        throw new Error(body || 'Admin login failed.');
+      }
+
+      const data = await response.json();
+      const roles = Array.isArray(data.roles) ? data.roles : [];
+      if (!roles.includes('Admin')) {
+        throw new Error('This user does not have the Admin role.');
+      }
+
+      localStorage.setItem('adminToken', data.token);
+      localStorage.setItem('adminUser', data.fullName || data.email);
+      setAuthToken(data.token);
+      setAdminUser(data.fullName || data.email);
+      setLoginForm({ email: '', password: '' });
+    } catch (e) {
+      setError(`Login error: ${e.message}`);
+    } finally {
+      setLoginLoading(false);
+    }
+  }
+
+  function logout() {
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminUser');
+    setAuthToken('');
+    setAdminUser('');
+    setRows([]);
+    setError('');
+  }
+
   async function createItem() {
     try {
       const payload = JSON.parse(createJson);
       const response = await fetch(`${API_BASE_URL}${resource.endpoint}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: createHeaders(),
         body: JSON.stringify(payload)
       });
 
@@ -132,7 +205,7 @@ function App() {
       const payload = JSON.parse(editJson);
       const response = await fetch(`${API_BASE_URL}${resource.endpoint}/${editId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: createHeaders(),
         body: JSON.stringify(payload)
       });
 
@@ -155,7 +228,8 @@ function App() {
 
     try {
       const response = await fetch(`${API_BASE_URL}${resource.endpoint}/${id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: createHeaders(false)
       });
       if (!response.ok) throw new Error('Delete failed.');
       await loadData();
@@ -167,6 +241,45 @@ function App() {
   function startEdit(row) {
     setEditId(row.id);
     setEditJson(JSON.stringify({ ...resource.updateDefaults, ...row, id: row.id }, null, 2));
+  }
+
+  if (!authToken) {
+    return (
+      <div className="auth-page">
+        <section className="auth-card panel">
+          <h1>Admin Login</h1>
+          <p>Sign in with an account that has the Admin role.</p>
+
+          {error && <p className="error">{error}</p>}
+
+          <form className="auth-form" onSubmit={adminLogin}>
+            <label htmlFor="admin-email">Email</label>
+            <input
+              id="admin-email"
+              type="email"
+              autoComplete="email"
+              value={loginForm.email}
+              onChange={(e) => setLoginForm((prev) => ({ ...prev, email: e.target.value }))}
+              required
+            />
+
+            <label htmlFor="admin-password">Password</label>
+            <input
+              id="admin-password"
+              type="password"
+              autoComplete="current-password"
+              value={loginForm.password}
+              onChange={(e) => setLoginForm((prev) => ({ ...prev, password: e.target.value }))}
+              required
+            />
+
+            <button type="submit" disabled={loginLoading}>
+              {loginLoading ? 'Signing in...' : 'Sign in as Admin'}
+            </button>
+          </form>
+        </section>
+      </div>
+    );
   }
 
   return (
@@ -185,6 +298,8 @@ function App() {
         </select>
 
         <button onClick={() => loadData()} disabled={loading}>Refresh</button>
+        <span className="auth-user">Signed in as {adminUser || 'Admin'}</span>
+        <button className="secondary" onClick={logout}>Logout</button>
       </div>
 
       {error && <p className="error">{error}</p>}
