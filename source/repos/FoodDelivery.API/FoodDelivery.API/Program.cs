@@ -37,11 +37,13 @@ builder.Services
         options.User.RequireUniqueEmail = true;
         options.Password.RequiredLength = 6;
     })
+    .AddRoles<IdentityRole>()
     .AddSignInManager<SignInManager<ApplicationUser>>()
     .AddEntityFrameworkStores<IdentityAuthDbContext>()
     .AddDefaultTokenProviders();
 
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+builder.Services.AddScoped<IdentitySeedService>();
 
 var jwtKey = builder.Configuration["Jwt:Key"] ?? "super-secret-dev-key-with-at-least-32-chars";
 var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "FoodDeliveryAPI";
@@ -69,6 +71,13 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+
+
+using (var scope = app.Services.CreateScope())
+{
+    var seedService = scope.ServiceProvider.GetRequiredService<IdentitySeedService>();
+    await seedService.SeedAdminAsync();
 }
 
 app.UseHttpsRedirection();

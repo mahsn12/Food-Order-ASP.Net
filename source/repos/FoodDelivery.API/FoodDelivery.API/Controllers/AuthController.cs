@@ -37,7 +37,10 @@ public class AuthController(
             return BadRequest(result.Errors.Select(x => x.Description));
         }
 
-        return Ok(new AuthResponse(user.Id, user.FullName, user.Email!, jwtTokenService.CreateToken(user)));
+        var token = await jwtTokenService.CreateTokenAsync(user);
+        var roles = await userManager.GetRolesAsync(user);
+
+        return Ok(new AuthResponse(user.Id, user.FullName, user.Email!, token, roles));
     }
 
     [HttpPost("login")]
@@ -55,7 +58,35 @@ public class AuthController(
             return Unauthorized("Invalid credentials.");
         }
 
-        return Ok(new AuthResponse(user.Id, user.FullName, user.Email!, jwtTokenService.CreateToken(user)));
+        var token = await jwtTokenService.CreateTokenAsync(user);
+        var roles = await userManager.GetRolesAsync(user);
+
+        return Ok(new AuthResponse(user.Id, user.FullName, user.Email!, token, roles));
+    }
+
+    [HttpPost("admin/login")]
+    public async Task<ActionResult<AuthResponse>> AdminLogin(AdminLoginRequest request)
+    {
+        var user = await userManager.FindByEmailAsync(request.Email);
+        if (user is null)
+        {
+            return Unauthorized("Invalid credentials.");
+        }
+
+        var result = await signInManager.CheckPasswordSignInAsync(user, request.Password, false);
+        if (!result.Succeeded)
+        {
+            return Unauthorized("Invalid credentials.");
+        }
+
+        var roles = await userManager.GetRolesAsync(user);
+        if (!roles.Contains("Admin"))
+        {
+            return Forbid();
+        }
+
+        var token = await jwtTokenService.CreateTokenAsync(user);
+        return Ok(new AuthResponse(user.Id, user.FullName, user.Email!, token, roles));
     }
 
     [HttpPost("forget-password")]
@@ -129,6 +160,9 @@ public class AuthController(
             }
         }
 
-        return Ok(new AuthResponse(user.Id, user.FullName, user.Email!, jwtTokenService.CreateToken(user)));
+        var token = await jwtTokenService.CreateTokenAsync(user);
+        var roles = await userManager.GetRolesAsync(user);
+
+        return Ok(new AuthResponse(user.Id, user.FullName, user.Email!, token, roles));
     }
 }
