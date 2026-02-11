@@ -55,7 +55,7 @@ namespace FoodDelivery.Infrastructure.Data
         {
             base.OnModelCreating(modelBuilder);
 
-           
+
             modelBuilder.Entity<Product>().Property(p => p.Price).HasColumnType("decimal(18,2)");
             modelBuilder.Entity<Order>().Property(o => o.TotalPrice).HasColumnType("decimal(18,2)");
             modelBuilder.Entity<OrderItem>().Property(oi => oi.Price).HasColumnType("decimal(18,2)");
@@ -67,10 +67,11 @@ namespace FoodDelivery.Infrastructure.Data
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Rating>()
-                .HasOne(r => r.User)
-                .WithMany()
-                .HasForeignKey(r => r.UserId)
-                .OnDelete(DeleteBehavior.NoAction);
+     .HasOne(r => r.User)
+     .WithMany(u => u.Ratings)
+     .HasForeignKey(r => r.UserId)
+     .OnDelete(DeleteBehavior.NoAction);
+
 
         }
     }
