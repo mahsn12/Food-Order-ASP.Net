@@ -63,12 +63,23 @@ export function AppProvider({ children }) {
     setCart([])
   }
 
-  const addToCart = (restaurantId, product, notes = '') => {
+  const addToCart = (restaurantId, product, notes = '', quantity = 1) => {
+    const safeQuantity = Number.isFinite(quantity) ? Math.max(1, Math.floor(quantity)) : 1
+
     setCart((prev) => {
-      if (prev.length && prev[0].restaurantId !== restaurantId) return [{ ...product, restaurantId, quantity: 1, notes }]
+      if (prev.length && prev[0].restaurantId !== restaurantId) {
+        return [{ ...product, restaurantId, quantity: safeQuantity, notes }]
+      }
+
       const found = prev.find((x) => x.id === product.id)
-      if (found) return prev.map((x) => x.id === product.id ? { ...x, quantity: x.quantity + 1, notes: notes || x.notes } : x)
-      return [...prev, { ...product, restaurantId, quantity: 1, notes }]
+
+      if (found) {
+        return prev.map((x) => x.id === product.id
+          ? { ...x, quantity: x.quantity + safeQuantity, notes: notes || x.notes }
+          : x)
+      }
+
+      return [...prev, { ...product, restaurantId, quantity: safeQuantity, notes }]
     })
   }
 
