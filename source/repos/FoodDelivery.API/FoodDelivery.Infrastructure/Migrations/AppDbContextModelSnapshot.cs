@@ -238,6 +238,13 @@ namespace FoodDelivery.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IdentityUserId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsOpen")
                         .HasColumnType("bit");
 

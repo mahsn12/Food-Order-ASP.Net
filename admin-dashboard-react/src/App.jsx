@@ -127,7 +127,12 @@ function App() {
       const response = await fetch(`${API_BASE_URL}${activeResource.endpoint}`, {
         headers: createHeaders(false)
       });
-      if (!response.ok) throw new Error(`Failed to fetch ${activeResource.label}.`);
+      if (!response.ok) {
+        const body = await response.text();
+        throw new Error(
+          `Failed to fetch ${activeResource.label}. Status: ${response.status}. ${body || 'No response body.'}`
+        );
+      }
       const data = await response.json();
       setRows(Array.isArray(data) ? data : []);
     } catch (e) {
