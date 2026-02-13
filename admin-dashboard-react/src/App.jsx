@@ -67,7 +67,16 @@ const resources = [
   }
 ];
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://food-delivery.runasp.net';
+const DEFAULT_API_BASE_URL = 'http://amr0adel-001-site1.ntempurl.com';
+
+function resolveApiBaseUrl() {
+  const configuredBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
+  const baseUrl = configuredBaseUrl || DEFAULT_API_BASE_URL;
+
+  return baseUrl.replace(/\/+$/, '');
+}
+
+const API_BASE_URL = resolveApiBaseUrl();
 
 function App() {
   const [resourceKey, setResourceKey] = useState(resources[0].key);
