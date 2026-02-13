@@ -1,4 +1,3 @@
-
 using System.Text;
 using FoodDelivery.API.Services;
 using FoodDelivery.Domain.IRepository;
@@ -12,24 +11,25 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
         policy =>
         {
-            policy.WithOrigins("http://localhost:5173")
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
+            policy
+                .WithOrigins(
+                    "http://localhost:5173",
+                    "https://localhost:5173"
+                )
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials();
         });
 });
-
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -38,7 +38,6 @@ builder.Services.AddDbContext<IdentityAuthDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-
 
 builder.Services
     .AddIdentityCore<ApplicationUser>(options =>
@@ -57,7 +56,6 @@ builder.Services
 
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IdentitySeedService>();
-
 
 var jwtKey = builder.Configuration["Jwt:Key"] ?? "super-secret-dev-key-with-at-least-32-chars";
 var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "FoodDeliveryAPI";
@@ -81,17 +79,12 @@ builder.Services
 
 var app = builder.Build();
 
-
 app.UseSwagger();
 app.UseSwaggerUI();
-
-
-
 
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
-
 
 using (var scope = app.Services.CreateScope())
 {
@@ -103,7 +96,6 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception ex)
     {
-    
         var logger = services.GetRequiredService<ILogger<Program>>();
         logger.LogError(ex, "An error occurred during seeding the Admin user.");
     }
