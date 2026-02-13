@@ -13,9 +13,9 @@ const resources = [
     key: 'restaurants',
     label: 'Restaurants',
     endpoint: '/api/Admin/Restaurants',
-    fields: ['id', 'name', 'description', 'phone', 'ratingAvg', 'isOpen', 'createdAt'],
-    createDefaults: { name: '', description: '', phone: '' },
-    updateDefaults: { id: 0, name: '', description: '', phone: '', isOpen: true }
+    fields: ['id', 'name', 'description', 'phone', 'email', 'ratingAvg', 'isOpen', 'createdAt'],
+    createDefaults: { name: '', description: '', phone: '', email: '', password: '' },
+    updateDefaults: { id: 0, name: '', description: '', phone: '', email: '', isOpen: true }
   },
   {
     key: 'products',
