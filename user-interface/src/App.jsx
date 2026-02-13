@@ -12,26 +12,29 @@ import CurrentOrderPage from './pages/CurrentOrder/CurrentOrderPage'
 import OrderHistoryPage from './pages/OrderHistory/OrderHistoryPage'
 import MyAccountPage from './pages/MyAccount/MyAccountPage'
 import AdminDashboardPage from './pages/AdminDashboard/AdminDashboardPage'
+import RestaurantDashboardPage from './pages/RestaurantDashboard/RestaurantDashboardPage'
 import { useRouter } from './utils/router'
 
 export default function App() {
-  const { token } = useApp()
+  const { token, isAdmin, isUser, isRestaurant } = useApp()
   const { path } = useRouter()
 
   const privateView = (node) => token ? node : <LoginPage />
+  const roleView = (node, canAccess) => privateView(canAccess ? node : <section className="card"><h2>Unauthorized</h2><p>Your account cannot access this page.</p></section>)
+
   const view = {
     '/': <HomePage />,
     '/login': <LoginPage />,
     '/register': <RegisterPage />,
     '/forgot-password': <ForgotPasswordPage />,
     '/reset-password': <ResetPasswordPage />,
-    '/cart': <CartPage />,
-    '/checkout': privateView(<CheckoutPage />),
-    '/orders/current': privateView(<CurrentOrderPage />),
-    '/orders/history': privateView(<OrderHistoryPage />,
-    ),
+    '/cart': roleView(<CartPage />, isUser),
+    '/checkout': roleView(<CheckoutPage />, isUser),
+    '/orders/current': roleView(<CurrentOrderPage />, isUser),
+    '/orders/history': roleView(<OrderHistoryPage />, isUser),
     '/account': privateView(<MyAccountPage />),
-    '/admin-dashboard': privateView(<AdminDashboardPage />)
+    '/admin-dashboard': roleView(<AdminDashboardPage />, isAdmin),
+    '/restaurant-dashboard': roleView(<RestaurantDashboardPage />, isRestaurant)
   }
 
   const page = path.startsWith('/restaurant/') ? <RestaurantPage /> : (view[path] || <HomePage />)

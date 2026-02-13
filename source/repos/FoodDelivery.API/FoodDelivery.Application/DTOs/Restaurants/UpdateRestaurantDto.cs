@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 namespace FoodDelivery.Application.DTOs.Restaurants
 {
     public record UpdateRestaurantDto(
         int Id,
-        string Name,
+        [Required] string Name,
         string Description,
-        string Phone,
-        bool IsOpen 
+        [Required] string Phone,
+        [Required, EmailAddress] string Email,
+        bool IsOpen
     );
 }

@@ -1,11 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-
-
 namespace FoodDelivery.Application.DTOs.Restaurants
 {
     public record RestaurantDto(
@@ -13,6 +5,7 @@ namespace FoodDelivery.Application.DTOs.Restaurants
         string Name,
         string Description,
         string Phone,
+        string Email,
         double RatingAvg,
         bool IsOpen,
         DateTime CreatedAt

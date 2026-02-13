@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using FoodDelivery.Domain.Entities;
 using FoodDelivery.Domain.IRepository;
 using FoodDelivery.Domain.Enums;
@@ -9,6 +10,7 @@ namespace FoodDelivery.API.Areas.Admin.Controllers
     [Area("Admin")]
     [Route("api/[area]/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class ReportsController : ControllerBase
     {
         

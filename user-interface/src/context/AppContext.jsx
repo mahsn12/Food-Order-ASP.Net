@@ -12,6 +12,9 @@ export function AppProvider({ children }) {
   const [orders, setOrders] = useState({ active: [], history: [] })
 
   const cartTotal = useMemo(() => cart.reduce((sum, x) => sum + x.price * x.quantity, 0), [cart])
+  const isAdmin = user?.roles?.includes('Admin')
+  const isRestaurant = user?.roles?.includes('Restaurant')
+  const isUser = user?.roles?.includes('User')
 
   const setAuthToken = (nextToken, remember = rememberMe) => {
     setToken(nextToken)
@@ -25,7 +28,7 @@ export function AppProvider({ children }) {
 
   const loadRestaurants = async () => setRestaurants(await apiRequest('/user/restaurants'))
   const loadOrders = async () => {
-    if (!token) return
+    if (!token || !isUser) return
     const [active, history] = await Promise.all([
       apiRequest('/user/orders/active', { token }),
       apiRequest('/user/orders/history', { token })
@@ -36,15 +39,15 @@ export function AppProvider({ children }) {
   const loadProfile = async () => {
     if (!token) return setUser(null)
     const profile = await apiRequest('/auth/profile', { token })
-    setUser(profile)
+    setUser((current) => ({ ...(current || {}), ...profile, roles: current?.roles || [] }))
   }
 
   useEffect(() => { loadRestaurants() }, [])
-  useEffect(() => { loadProfile(); loadOrders() }, [token])
+  useEffect(() => { loadProfile() }, [token])
+  useEffect(() => { loadOrders() }, [token, isUser])
 
-  const login = async (email, password, isAdmin = false, remember = false) => {
-    const route = isAdmin ? '/auth/admin/login' : '/auth/login'
-    const auth = await apiRequest(route, { method: 'POST', body: { email, password } })
+  const login = async (email, password, remember = false) => {
+    const auth = await apiRequest('/auth/login', { method: 'POST', body: { email, password } })
     setAuthToken(auth.token, remember)
     setUser({ id: auth.userId, fullName: auth.fullName, email: auth.email, roles: auth.roles })
     return auth
@@ -97,7 +100,7 @@ export function AppProvider({ children }) {
     return order
   }
 
-  return <AppContext.Provider value={{ token, user, rememberMe, restaurants, cart, cartTotal, orders, loadOrders, setUser, setRememberMe, login, register, logout, addToCart, updateQty, removeFromCart, placeOrder, setAuthToken }}>{children}</AppContext.Provider>
+  return <AppContext.Provider value={{ token, user, rememberMe, restaurants, cart, cartTotal, orders, isAdmin, isRestaurant, isUser, loadOrders, setUser, setRememberMe, login, register, logout, addToCart, updateQty, removeFromCart, placeOrder, setAuthToken }}>{children}</AppContext.Provider>
 }
 
 export const useApp = () => useContext(AppContext)

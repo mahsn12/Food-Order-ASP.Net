@@ -1,8 +1,5 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FoodDelivery.Domain.Entities
 {
@@ -12,6 +9,8 @@ namespace FoodDelivery.Domain.Entities
         public string Name { get; set; }
         public string Description { get; set; }
         public string Phone { get; set; }
+        public string Email { get; set; }
+        public string? IdentityUserId { get; set; }
         public double RatingAvg { get; set; }
         public bool IsOpen { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -19,5 +18,4 @@ namespace FoodDelivery.Domain.Entities
         public ICollection<Product> Products { get; set; }
         public ICollection<Order> Orders { get; set; }
     }
-
 }

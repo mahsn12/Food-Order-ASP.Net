@@ -1,6 +1,7 @@
 using FoodDelivery.Application.DTOs.Payments;
 using FoodDelivery.Domain.Entities;
 using FoodDelivery.Domain.IRepository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FoodDelivery.API.Areas.Admin.Controllers;
@@ -8,6 +9,7 @@ namespace FoodDelivery.API.Areas.Admin.Controllers;
 [Area("Admin")]
 [Route("api/[area]/[controller]")]
 [ApiController]
+    [Authorize(Roles = "Admin")]
 public class PaymentsController(IRepository<Payment> paymentRepo) : ControllerBase
 {
     [HttpGet]
