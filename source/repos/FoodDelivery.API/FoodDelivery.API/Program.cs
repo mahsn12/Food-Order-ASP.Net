@@ -23,7 +23,9 @@ builder.Services.AddCors(options =>
             policy
                 .WithOrigins(
                     "http://localhost:5173",
-                    "https://localhost:5173"
+                    "https://localhost:5173",
+                    "http://localhost:5174",
+                    "https://localhost:5174"
                 )
                 .AllowAnyHeader()
                 .AllowAnyMethod()
@@ -56,6 +58,7 @@ builder.Services
 
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IdentitySeedService>();
+builder.Services.AddScoped<AppDataSeedService>();
 
 var jwtKey = builder.Configuration["Jwt:Key"] ?? "super-secret-dev-key-with-at-least-32-chars";
 var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "FoodDeliveryAPI";
@@ -93,6 +96,9 @@ using (var scope = app.Services.CreateScope())
     {
         var seedService = services.GetRequiredService<IdentitySeedService>();
         await seedService.SeedAdminAsync();
+
+        var appDataSeedService = services.GetRequiredService<AppDataSeedService>();
+        await appDataSeedService.SeedAsync();
     }
     catch (Exception ex)
     {
