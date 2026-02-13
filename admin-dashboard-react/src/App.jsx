@@ -67,7 +67,7 @@ const resources = [
   }
 ];
 
-const DEFAULT_API_BASE_URL = 'http://amr0adel-001-site1.ntempurl.com';
+const DEFAULT_API_BASE_URL = 'http://localhost:5082';
 
 function resolveApiBaseUrl() {
   const configuredBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
