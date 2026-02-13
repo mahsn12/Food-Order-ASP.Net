@@ -10,7 +10,7 @@ namespace FoodDelivery.API.Controllers;
 
 [ApiController]
 [Route("api/user")]
-[Authorize]
+[Authorize(Roles = "User")]
 public class UserExperienceController(
     AppDbContext appDbContext,
     UserManager<ApplicationUser> userManager,
@@ -245,7 +245,7 @@ public class UserExperienceController(
     }
 
     private static RestaurantMenuResponse ToRestaurantResponse(FoodDelivery.Domain.Entities.Restaurant r)
-        => new(r.Id, r.Name, r.Description, r.Phone, r.RatingAvg, r.IsOpen,
+        => new(r.Id, r.Name, r.Description, r.Phone, r.Email, r.RatingAvg, r.IsOpen,
             r.Products.Where(p => p.IsAvailable).OrderBy(p => p.Name).Select(p => new ProductMenuResponse(p.Id, p.Name, p.Description, p.Price, p.ImageUrl, p.IsAvailable)).ToList());
 
     private static OrderSummaryResponse ToSummary(FoodDelivery.Domain.Entities.Order o)
@@ -253,7 +253,7 @@ public class UserExperienceController(
 }
 
 public record ProductMenuResponse(int Id, string Name, string Description, decimal Price, string ImageUrl, bool IsAvailable);
-public record RestaurantMenuResponse(int Id, string Name, string Description, string Phone, double RatingAvg, bool IsOpen, IReadOnlyCollection<ProductMenuResponse> Products);
+public record RestaurantMenuResponse(int Id, string Name, string Description, string Phone, string Email, double RatingAvg, bool IsOpen, IReadOnlyCollection<ProductMenuResponse> Products);
 public record UpdateAccountRequest(string FullName, string? PhoneNumber);
 public record AccountResponse(string FullName, string Email, string? PhoneNumber);
 public record ChangePasswordRequest(string CurrentPassword, string NewPassword);

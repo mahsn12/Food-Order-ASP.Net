@@ -11,6 +11,22 @@ public class IdentitySeedService(
 {
     public async Task SeedAdminAsync()
     {
+        var roles = new[] { "Admin", "User", "Restaurant", "Delivery" };
+        foreach (var role in roles)
+        {
+            if (await roleManager.RoleExistsAsync(role))
+            {
+                continue;
+            }
+
+            var roleResult = await roleManager.CreateAsync(new IdentityRole(role));
+            if (!roleResult.Succeeded)
+            {
+                var errors = string.Join(", ", roleResult.Errors.Select(e => e.Description));
+                throw new InvalidOperationException($"Could not create role {role}: {errors}");
+            }
+        }
+
         var email = configuration["AdminAccount:Email"];
         var password = configuration["AdminAccount:Password"];
         var fullName = configuration["AdminAccount:FullName"] ?? "System Admin";
@@ -19,18 +35,6 @@ public class IdentitySeedService(
         {
             logger.LogWarning("AdminAccount credentials are not configured. Admin seeding skipped.");
             return;
-        }
-
-        const string adminRole = "Admin";
-
-        if (!await roleManager.RoleExistsAsync(adminRole))
-        {
-            var roleResult = await roleManager.CreateAsync(new IdentityRole(adminRole));
-            if (!roleResult.Succeeded)
-            {
-                var errors = string.Join(", ", roleResult.Errors.Select(e => e.Description));
-                throw new InvalidOperationException($"Could not create Admin role: {errors}");
-            }
         }
 
         var adminUser = await userManager.FindByEmailAsync(email);
@@ -54,9 +58,9 @@ public class IdentitySeedService(
             logger.LogInformation("Admin user created with email {Email}", email);
         }
 
-        if (!await userManager.IsInRoleAsync(adminUser, adminRole))
+        if (!await userManager.IsInRoleAsync(adminUser, "Admin"))
         {
-            var addRoleResult = await userManager.AddToRoleAsync(adminUser, adminRole);
+            var addRoleResult = await userManager.AddToRoleAsync(adminUser, "Admin");
             if (!addRoleResult.Succeeded)
             {
                 var errors = string.Join(", ", addRoleResult.Errors.Select(e => e.Description));

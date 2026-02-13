@@ -37,6 +37,8 @@ public class AuthController(
             return BadRequest(result.Errors.Select(x => x.Description));
         }
 
+        await userManager.AddToRoleAsync(user, "User");
+
         var token = await jwtTokenService.CreateTokenAsync(user);
         var roles = await userManager.GetRolesAsync(user);
 
@@ -158,6 +160,8 @@ public class AuthController(
             {
                 return BadRequest(createResult.Errors.Select(x => x.Description));
             }
+
+            await userManager.AddToRoleAsync(user, "User");
         }
 
         var token = await jwtTokenService.CreateTokenAsync(user);
