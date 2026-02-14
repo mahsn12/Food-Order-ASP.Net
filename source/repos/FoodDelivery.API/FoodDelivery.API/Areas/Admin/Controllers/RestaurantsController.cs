@@ -1,9 +1,7 @@
 using FoodDelivery.Application.DTOs.Restaurants;
 using FoodDelivery.Domain.Entities;
 using FoodDelivery.Domain.IRepository;
-using FoodDelivery.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FoodDelivery.API.Areas.Admin.Controllers
@@ -15,12 +13,10 @@ namespace FoodDelivery.API.Areas.Admin.Controllers
     public class RestaurantsController : ControllerBase
     {
         private readonly IRepository<Restaurant> _restaurantRepo;
-        private readonly UserManager<ApplicationUser> _userManager;
 
-        public RestaurantsController(IRepository<Restaurant> restaurantRepo, UserManager<ApplicationUser> userManager)
+        public RestaurantsController(IRepository<Restaurant> restaurantRepo)
         {
             _restaurantRepo = restaurantRepo;
-            _userManager = userManager;
         }
 
         [HttpGet]
@@ -70,25 +66,9 @@ namespace FoodDelivery.API.Areas.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (await _userManager.FindByEmailAsync(request.Email) is not null)
+            var existing = await _restaurantRepo.GetOneAsync(r => r.Email == request.Email);
+            if (existing is not null)
                 return BadRequest("Email is already used.");
-
-            var identityUser = new ApplicationUser
-            {
-                UserName = request.Email,
-                Email = request.Email,
-                FullName = request.Name,
-                PhoneNumber = request.Phone,
-                EmailConfirmed = true
-            };
-
-            var createUserResult = await _userManager.CreateAsync(identityUser, request.Password);
-            if (!createUserResult.Succeeded)
-                return BadRequest(createUserResult.Errors.Select(e => e.Description));
-
-            var addRoleResult = await _userManager.AddToRoleAsync(identityUser, "Restaurant");
-            if (!addRoleResult.Succeeded)
-                return BadRequest(addRoleResult.Errors.Select(e => e.Description));
 
             var restaurant = new Restaurant
             {
@@ -96,7 +76,7 @@ namespace FoodDelivery.API.Areas.Admin.Controllers
                 Description = request.Description,
                 Phone = request.Phone,
                 Email = request.Email,
-                IdentityUserId = identityUser.Id,
+                PasswordHash = request.Password,
                 RatingAvg = 0,
                 IsOpen = true,
                 CreatedAt = DateTime.UtcNow
@@ -139,19 +119,6 @@ namespace FoodDelivery.API.Areas.Admin.Controllers
             _restaurantRepo.Update(restaurant);
             await _restaurantRepo.CommitAsync();
 
-            if (!string.IsNullOrWhiteSpace(restaurant.IdentityUserId))
-            {
-                var identityUser = await _userManager.FindByIdAsync(restaurant.IdentityUserId);
-                if (identityUser is not null)
-                {
-                    identityUser.Email = request.Email;
-                    identityUser.UserName = request.Email;
-                    identityUser.FullName = request.Name;
-                    identityUser.PhoneNumber = request.Phone;
-                    await _userManager.UpdateAsync(identityUser);
-                }
-            }
-
             return NoContent();
         }
 
@@ -165,15 +132,6 @@ namespace FoodDelivery.API.Areas.Admin.Controllers
 
             _restaurantRepo.Delete(restaurant);
             await _restaurantRepo.CommitAsync();
-
-            if (!string.IsNullOrWhiteSpace(restaurant.IdentityUserId))
-            {
-                var identityUser = await _userManager.FindByIdAsync(restaurant.IdentityUserId);
-                if (identityUser is not null)
-                {
-                    await _userManager.DeleteAsync(identityUser);
-                }
-            }
 
             return NoContent();
         }

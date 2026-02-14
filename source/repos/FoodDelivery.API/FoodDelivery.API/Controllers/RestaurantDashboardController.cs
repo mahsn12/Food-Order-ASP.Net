@@ -132,9 +132,10 @@ public class RestaurantDashboardController(AppDbContext appDbContext) : Controll
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         var email = User.FindFirstValue(ClaimTypes.Email);
+        var hasParsedId = int.TryParse(userId, out var restaurantId);
 
         return await appDbContext.Restaurants
-            .FirstOrDefaultAsync(r => (!string.IsNullOrWhiteSpace(userId) && r.IdentityUserId == userId) || (!string.IsNullOrWhiteSpace(email) && r.Email == email));
+            .FirstOrDefaultAsync(r => (hasParsedId && r.Id == restaurantId) || (!string.IsNullOrWhiteSpace(email) && r.Email == email));
     }
 }
 

@@ -10,7 +10,7 @@ namespace FoodDelivery.Domain.Entities
         public string Description { get; set; }
         public string Phone { get; set; }
         public string Email { get; set; }
-        public string? IdentityUserId { get; set; }
+        public string PasswordHash { get; set; }
         public double RatingAvg { get; set; }
         public bool IsOpen { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

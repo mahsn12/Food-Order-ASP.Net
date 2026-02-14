@@ -1,12 +1,10 @@
 using FoodDelivery.Domain.Entities;
 using FoodDelivery.Infrastructure.Data;
-using FoodDelivery.Infrastructure.Identity;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace FoodDelivery.API.Services;
 
-public class AppDataSeedService(AppDbContext appDbContext, UserManager<ApplicationUser> userManager)
+public class AppDataSeedService(AppDbContext appDbContext)
 {
     public async Task SeedAsync()
     {
@@ -59,34 +57,13 @@ public class AppDataSeedService(AppDbContext appDbContext, UserManager<Applicati
 
         foreach (var seedRestaurant in seedRestaurants)
         {
-            var owner = await userManager.FindByEmailAsync(seedRestaurant.Email);
-            if (owner is null)
-            {
-                owner = new ApplicationUser
-                {
-                    UserName = seedRestaurant.Email,
-                    Email = seedRestaurant.Email,
-                    FullName = seedRestaurant.Name,
-                    PhoneNumber = seedRestaurant.Phone,
-                    EmailConfirmed = true
-                };
-
-                var createResult = await userManager.CreateAsync(owner, seedRestaurant.Password);
-                if (!createResult.Succeeded)
-                {
-                    throw new InvalidOperationException(string.Join(", ", createResult.Errors.Select(e => e.Description)));
-                }
-
-                await userManager.AddToRoleAsync(owner, "Restaurant");
-            }
-
             restaurants.Add(new Restaurant
             {
                 Name = seedRestaurant.Name,
                 Description = seedRestaurant.Description,
                 Phone = seedRestaurant.Phone,
                 Email = seedRestaurant.Email,
-                IdentityUserId = owner.Id,
+                PasswordHash = seedRestaurant.Password,
                 IsOpen = true,
                 RatingAvg = 4.5,
                 Products = seedRestaurant.Products

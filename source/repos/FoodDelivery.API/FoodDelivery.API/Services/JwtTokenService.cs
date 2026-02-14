@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using FoodDelivery.Domain.Entities;
 using FoodDelivery.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -11,6 +12,7 @@ namespace FoodDelivery.API.Services;
 public interface IJwtTokenService
 {
     Task<string> CreateTokenAsync(ApplicationUser user);
+    string CreateRestaurantToken(Restaurant restaurant);
 }
 
 public class JwtTokenService(
@@ -34,6 +36,36 @@ public class JwtTokenService(
         };
 
         claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+
+        var credentials = new SigningCredentials(
+            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+            SecurityAlgorithms.HmacSha256);
+
+        var token = new JwtSecurityToken(
+            issuer,
+            audience,
+            claims,
+            expires: DateTime.UtcNow.AddHours(12),
+            signingCredentials: credentials);
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    public string CreateRestaurantToken(Restaurant restaurant)
+    {
+        var key = configuration["Jwt:Key"] ?? "super-secret-dev-key-with-at-least-32-chars";
+        var issuer = configuration["Jwt:Issuer"] ?? "FoodDeliveryAPI";
+        var audience = configuration["Jwt:Audience"] ?? "FoodDeliveryClients";
+
+        var claims = new List<Claim>
+        {
+            new(JwtRegisteredClaimNames.Sub, restaurant.Id.ToString()),
+            new(ClaimTypes.NameIdentifier, restaurant.Id.ToString()),
+            new(JwtRegisteredClaimNames.Email, restaurant.Email),
+            new(ClaimTypes.Email, restaurant.Email),
+            new("fullName", restaurant.Name),
+            new(ClaimTypes.Role, "Restaurant")
+        };
 
         var credentials = new SigningCredentials(
             new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
