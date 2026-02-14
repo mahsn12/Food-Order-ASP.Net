@@ -94,6 +94,12 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     try
     {
+        var appDbContext = services.GetRequiredService<AppDbContext>();
+        await appDbContext.Database.MigrateAsync();
+
+        var identityDbContext = services.GetRequiredService<IdentityAuthDbContext>();
+        await identityDbContext.Database.MigrateAsync();
+
         var seedService = services.GetRequiredService<IdentitySeedService>();
         await seedService.SeedAdminAsync();
 
@@ -103,7 +109,7 @@ using (var scope = app.Services.CreateScope())
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred during seeding the Admin user.");
+        logger.LogError(ex, "An error occurred while applying migrations or seeding data.");
     }
 }
 
