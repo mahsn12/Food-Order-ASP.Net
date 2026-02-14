@@ -45,7 +45,13 @@ public class AuthController(
         var token = await jwtTokenService.CreateTokenAsync(user);
         var roles = await userManager.GetRolesAsync(user);
 
-        return Ok(new AuthResponse(user.Id, user.FullName, user.Email!, token, roles.ToList()));
+        return Ok(new AuthResponse(
+            user.Id,
+            user.FullName,
+            user.Email!,
+            token,
+            roles.ToArray()
+        ));
     }
 
     [HttpPost("login")]
@@ -75,7 +81,13 @@ public class AuthController(
         var token = await jwtTokenService.CreateTokenAsync(user);
         var roles = await userManager.GetRolesAsync(user);
 
-        return Ok(new AuthResponse(user.Id, user.FullName, user.Email!, token, roles.ToList()));
+        return Ok(new AuthResponse(
+            user.Id,
+            user.FullName,
+            user.Email!,
+            token,
+            roles.ToArray()
+        ));
     }
 
     [HttpPost("admin/login")]
@@ -100,7 +112,14 @@ public class AuthController(
         }
 
         var token = await jwtTokenService.CreateTokenAsync(user);
-        return Ok(new AuthResponse(user.Id, user.FullName, user.Email!, token, roles.ToList()));
+
+        return Ok(new AuthResponse(
+            user.Id,
+            user.FullName,
+            user.Email!,
+            token,
+            roles.ToArray()
+        ));
     }
 
     [HttpPost("forget-password")]
@@ -138,7 +157,11 @@ public class AuthController(
     [HttpGet("profile")]
     public async Task<ActionResult<ProfileResponse>> Profile()
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue(ClaimTypes.Name) ?? User.FindFirstValue("sub");
+        var userId =
+            User.FindFirstValue(ClaimTypes.NameIdentifier) ??
+            User.FindFirstValue(ClaimTypes.Name) ??
+            User.FindFirstValue("sub");
+
         if (string.IsNullOrWhiteSpace(userId))
         {
             return Unauthorized();
@@ -150,7 +173,13 @@ public class AuthController(
             return NotFound();
         }
 
-        return Ok(new ProfileResponse(user.Id, user.FullName, user.Email ?? string.Empty, user.PhoneNumber, user.CreatedAt));
+        return Ok(new ProfileResponse(
+            user.Id,
+            user.FullName,
+            user.Email ?? string.Empty,
+            user.PhoneNumber,
+            user.CreatedAt
+        ));
     }
 
     [HttpPost("external-login")]
@@ -179,6 +208,12 @@ public class AuthController(
         var token = await jwtTokenService.CreateTokenAsync(user);
         var roles = await userManager.GetRolesAsync(user);
 
-        return Ok(new AuthResponse(user.Id, user.FullName, user.Email!, token, roles.ToList()));
+        return Ok(new AuthResponse(
+            user.Id,
+            user.FullName,
+            user.Email!,
+            token,
+            roles.ToArray()
+        ));
     }
 }
