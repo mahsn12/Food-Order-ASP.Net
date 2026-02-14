@@ -1,10 +1,12 @@
 using System.Security.Claims;
 using FoodDelivery.API.Models.Auth;
 using FoodDelivery.API.Services;
+using FoodDelivery.Infrastructure.Data;
 using FoodDelivery.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace FoodDelivery.API.Controllers;
 
@@ -13,7 +15,8 @@ namespace FoodDelivery.API.Controllers;
 public class AuthController(
     UserManager<ApplicationUser> userManager,
     SignInManager<ApplicationUser> signInManager,
-    IJwtTokenService jwtTokenService) : ControllerBase
+    IJwtTokenService jwtTokenService,
+    AppDbContext appDbContext) : ControllerBase
 {
     [HttpPost("register")]
     public async Task<ActionResult<AuthResponse>> Register(RegisterRequest request)
@@ -51,7 +54,16 @@ public class AuthController(
         var user = await userManager.FindByEmailAsync(request.Email);
         if (user is null)
         {
-            return Unauthorized("Invalid credentials.");
+            var restaurant = await appDbContext.Restaurants.AsNoTracking()
+                .FirstOrDefaultAsync(r => r.Email == request.Email);
+
+            if (restaurant is null || restaurant.PasswordHash != request.Password)
+            {
+                return Unauthorized("Invalid credentials.");
+            }
+
+            var restaurantToken = jwtTokenService.CreateRestaurantToken(restaurant);
+            return Ok(new AuthResponse(restaurant.Id.ToString(), restaurant.Name, restaurant.Email, restaurantToken, ["Restaurant"]));
         }
 
         var result = await signInManager.CheckPasswordSignInAsync(user, request.Password, false);
